@@ -61,12 +61,14 @@ export class CandyMarketplaceProgram {
 
   async initUser(
     args: InstructionArgs<"initUser">,
+    partialAccounts: Pick<InstructionAccounts<"initUser">, "referrer">,
     transactionInstructions: TransactionInstruction[],
   ) {
     const user = this.findUserAccount({
       owner: this.payer,
     });
     const accounts: InstructionAccounts<"initUser"> = {
+      ...partialAccounts,
       payer: this.payer,
       instructions: this.sysvarInstructions,
       user,
@@ -102,6 +104,24 @@ export class CandyMarketplaceProgram {
         .rpc({ commitment: this.commitment });
     } catch (error) {
       return this.handleError("updateUser", error);
+    }
+  }
+
+  async deleteUser() {
+    const user = this.findUserAccount({
+      owner: this.payer,
+    });
+    const accounts: InstructionAccounts<"deleteUser"> = {
+      payer: this.payer,
+      user,
+    };
+    try {
+      await this.program.methods
+        .deleteUser()
+        .accounts(accounts)
+        .rpc({ commitment: this.commitment });
+    } catch (error) {
+      return this.handleError("deleteUser", error);
     }
   }
 

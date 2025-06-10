@@ -14,6 +14,61 @@ export type CandyLeaderboard = {
   },
   "instructions": [
     {
+      "name": "deleteUser",
+      "discriminator": [
+        186,
+        85,
+        17,
+        249,
+        219,
+        231,
+        98,
+        251
+      ],
+      "accounts": [
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "user",
+          "docs": [
+            "PDA storing listing metadata. Checked in program logic."
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  117,
+                  115,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "payer"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  0
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "initUser",
       "discriminator": [
         14,
@@ -55,11 +110,14 @@ export type CandyLeaderboard = {
               {
                 "kind": "const",
                 "value": [
-                  1
+                  0
                 ]
               }
             ]
           }
+        },
+        {
+          "name": "referrer"
         },
         {
           "name": "instructions",
@@ -123,7 +181,7 @@ export type CandyLeaderboard = {
               {
                 "kind": "const",
                 "value": [
-                  1
+                  0
                 ]
               }
             ]
@@ -166,6 +224,19 @@ export type CandyLeaderboard = {
     }
   ],
   "events": [
+    {
+      "name": "userDelete",
+      "discriminator": [
+        168,
+        29,
+        18,
+        253,
+        29,
+        112,
+        44,
+        89
+      ]
+    },
     {
       "name": "userInit",
       "discriminator": [
@@ -222,6 +293,10 @@ export type CandyLeaderboard = {
         "kind": "struct",
         "fields": [
           {
+            "name": "level",
+            "type": "u8"
+          },
+          {
             "name": "xp",
             "type": "u64"
           },
@@ -237,6 +312,10 @@ export type CandyLeaderboard = {
       "type": {
         "kind": "struct",
         "fields": [
+          {
+            "name": "level",
+            "type": "u8"
+          },
           {
             "name": "xp",
             "type": "u64"
@@ -262,6 +341,10 @@ export type CandyLeaderboard = {
             "type": "u8"
           },
           {
+            "name": "level",
+            "type": "u8"
+          },
+          {
             "name": "xp",
             "type": "u64"
           },
@@ -272,6 +355,26 @@ export type CandyLeaderboard = {
           {
             "name": "auraSpent",
             "type": "u64"
+          },
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "referrer",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "userDelete",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "season",
+            "type": "u8"
           },
           {
             "name": "owner",
@@ -345,12 +448,12 @@ export type CandyLeaderboard = {
     {
       "name": "currentSeason",
       "type": "u8",
-      "value": "1"
+      "value": "0"
     },
     {
       "name": "currentSeasonSeed",
       "type": "bytes",
-      "value": "[1]"
+      "value": "[0]"
     },
     {
       "name": "messagePubkey",
