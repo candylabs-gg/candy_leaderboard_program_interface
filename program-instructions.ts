@@ -15,7 +15,7 @@ import IDL from "./candy_leaderboard.json";
 import { ProgramStatic } from "./program-static";
 
 export class CandyMarketplaceProgram {
-  private program: Program<CandyLeaderboard>;
+  public program: Program<CandyLeaderboard>;
   public payer: PublicKey;
   public utils = ProgramStatic();
   public sysvarInstructions = this.utils.getConstantValue(
