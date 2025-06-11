@@ -33,9 +33,6 @@ export type CandyLeaderboard = {
         },
         {
           "name": "user",
-          "docs": [
-            "PDA storing listing metadata. Checked in program logic."
-          ],
           "writable": true,
           "pda": {
             "seeds": [
@@ -88,9 +85,6 @@ export type CandyLeaderboard = {
         },
         {
           "name": "user",
-          "docs": [
-            "PDA storing listing metadata. Checked in program logic."
-          ],
           "writable": true,
           "pda": {
             "seeds": [
@@ -159,9 +153,6 @@ export type CandyLeaderboard = {
         },
         {
           "name": "user",
-          "docs": [
-            "PDA storing listing metadata. Checked in program logic."
-          ],
           "writable": true,
           "pda": {
             "seeds": [
@@ -284,6 +275,11 @@ export type CandyLeaderboard = {
       "code": 6003,
       "name": "invalidSignedMessage",
       "msg": "invalidSignedMessage"
+    },
+    {
+      "code": 6004,
+      "name": "invalidReferrer",
+      "msg": "invalidReferrer"
     }
   ],
   "types": [
@@ -303,6 +299,15 @@ export type CandyLeaderboard = {
           {
             "name": "aura",
             "type": "u64"
+          },
+          {
+            "name": "achievements",
+            "type": {
+              "array": [
+                "u128",
+                2
+              ]
+            }
           }
         ]
       }
@@ -323,6 +328,15 @@ export type CandyLeaderboard = {
           {
             "name": "aura",
             "type": "u64"
+          },
+          {
+            "name": "achievements",
+            "type": {
+              "array": [
+                "u128",
+                2
+              ]
+            }
           }
         ]
       }
@@ -363,6 +377,15 @@ export type CandyLeaderboard = {
           {
             "name": "referrer",
             "type": "pubkey"
+          },
+          {
+            "name": "achievements",
+            "type": {
+              "array": [
+                "u128",
+                2
+              ]
+            }
           }
         ]
       }
@@ -411,6 +434,15 @@ export type CandyLeaderboard = {
           {
             "name": "owner",
             "type": "pubkey"
+          },
+          {
+            "name": "achievements",
+            "type": {
+              "array": [
+                "u128",
+                2
+              ]
+            }
           }
         ]
       }
@@ -439,6 +471,15 @@ export type CandyLeaderboard = {
           {
             "name": "owner",
             "type": "pubkey"
+          },
+          {
+            "name": "achievements",
+            "type": {
+              "array": [
+                "u128",
+                2
+              ]
+            }
           }
         ]
       }

@@ -27,9 +27,6 @@
         },
         {
           "name": "user",
-          "docs": [
-            "PDA storing listing metadata. Checked in program logic."
-          ],
           "writable": true,
           "pda": {
             "seeds": [
@@ -82,9 +79,6 @@
         },
         {
           "name": "user",
-          "docs": [
-            "PDA storing listing metadata. Checked in program logic."
-          ],
           "writable": true,
           "pda": {
             "seeds": [
@@ -153,9 +147,6 @@
         },
         {
           "name": "user",
-          "docs": [
-            "PDA storing listing metadata. Checked in program logic."
-          ],
           "writable": true,
           "pda": {
             "seeds": [
@@ -278,6 +269,11 @@
       "code": 6003,
       "name": "InvalidSignedMessage",
       "msg": "InvalidSignedMessage"
+    },
+    {
+      "code": 6004,
+      "name": "InvalidReferrer",
+      "msg": "InvalidReferrer"
     }
   ],
   "types": [
@@ -297,6 +293,15 @@
           {
             "name": "aura",
             "type": "u64"
+          },
+          {
+            "name": "achievements",
+            "type": {
+              "array": [
+                "u128",
+                2
+              ]
+            }
           }
         ]
       }
@@ -317,6 +322,15 @@
           {
             "name": "aura",
             "type": "u64"
+          },
+          {
+            "name": "achievements",
+            "type": {
+              "array": [
+                "u128",
+                2
+              ]
+            }
           }
         ]
       }
@@ -357,6 +371,15 @@
           {
             "name": "referrer",
             "type": "pubkey"
+          },
+          {
+            "name": "achievements",
+            "type": {
+              "array": [
+                "u128",
+                2
+              ]
+            }
           }
         ]
       }
@@ -405,6 +428,15 @@
           {
             "name": "owner",
             "type": "pubkey"
+          },
+          {
+            "name": "achievements",
+            "type": {
+              "array": [
+                "u128",
+                2
+              ]
+            }
           }
         ]
       }
@@ -433,6 +465,15 @@
           {
             "name": "owner",
             "type": "pubkey"
+          },
+          {
+            "name": "achievements",
+            "type": {
+              "array": [
+                "u128",
+                2
+              ]
+            }
           }
         ]
       }
