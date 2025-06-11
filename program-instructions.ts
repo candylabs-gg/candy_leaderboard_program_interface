@@ -135,10 +135,9 @@ export class CandyMarketplaceProgram {
   getSecp256k1Instruction(
     message: string,
     signature: ethers.Signature,
-    wallet?: ethers.Wallet,
+    address?: string,
   ) {
-    const ethWallet =
-      wallet ?? new ethers.Wallet(process.env.PRIVATE_KEY ?? "");
+    const ethAddress = address ?? new ethers.Wallet(process.env.PRIVATE_KEY ?? "").address
 
     const messageBytes = Buffer.from(message);
 
@@ -151,7 +150,7 @@ export class CandyMarketplaceProgram {
     }
 
     return Secp256k1Program.createInstructionWithEthAddress({
-      ethAddress: ethWallet.address.slice(2),
+      ethAddress: ethAddress.slice(2),
       message: messageBytes,
       signature: Buffer.concat([rBuf, sBuf]), // 64 bytes
       recoveryId,
