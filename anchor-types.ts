@@ -80,7 +80,7 @@ export type ConstantName = StaticProgramConstants[number]["name"];
 export type ConstantValue<Name extends ConstantName> = Extract<
   StaticProgramConstants[number],
   { name: Name }
->["type"] extends keyof TypeMapping // @ts-expect-error shut up
+>["type"] extends keyof TypeMapping
   ? TypeMapping[Extract<StaticProgramConstants[number], { name: Name }>["type"]]
   : never;
 
