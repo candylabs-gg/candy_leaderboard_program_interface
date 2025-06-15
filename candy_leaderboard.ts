@@ -84,6 +84,11 @@ export type CandyLeaderboard = {
           "signer": true
         },
         {
+          "name": "cosigner",
+          "signer": true,
+          "address": "GgD5PpVu5Gmns4ByFTudbjjxGxtEt8zLWmgsqdJCq222"
+        },
+        {
           "name": "user",
           "writable": true,
           "pda": {
@@ -112,10 +117,6 @@ export type CandyLeaderboard = {
         },
         {
           "name": "referrer"
-        },
-        {
-          "name": "instructions",
-          "address": "Sysvar1nstructions1111111111111111111111111"
         },
         {
           "name": "systemProgram",
@@ -152,6 +153,11 @@ export type CandyLeaderboard = {
           "signer": true
         },
         {
+          "name": "cosigner",
+          "signer": true,
+          "address": "GgD5PpVu5Gmns4ByFTudbjjxGxtEt8zLWmgsqdJCq222"
+        },
+        {
           "name": "user",
           "writable": true,
           "pda": {
@@ -177,10 +183,6 @@ export type CandyLeaderboard = {
               }
             ]
           }
-        },
-        {
-          "name": "instructions",
-          "address": "Sysvar1nstructions1111111111111111111111111"
         },
         {
           "name": "systemProgram",
@@ -258,26 +260,6 @@ export type CandyLeaderboard = {
   "errors": [
     {
       "code": 6000,
-      "name": "priceBelowMinimumThreshold",
-      "msg": "priceBelowMinimumThreshold"
-    },
-    {
-      "code": 6001,
-      "name": "secpInstructionMissing",
-      "msg": "secpInstructionMissing"
-    },
-    {
-      "code": 6002,
-      "name": "secpInstructionInvalid",
-      "msg": "secpInstructionInvalid"
-    },
-    {
-      "code": 6003,
-      "name": "invalidSignedMessage",
-      "msg": "invalidSignedMessage"
-    },
-    {
-      "code": 6004,
       "name": "invalidReferrer",
       "msg": "invalidReferrer"
     }
@@ -497,24 +479,14 @@ export type CandyLeaderboard = {
       "value": "[0]"
     },
     {
-      "name": "messagePubkey",
-      "type": {
-        "array": [
-          "u8",
-          20
-        ]
-      },
-      "value": "[36, 222, 218, 73, 135, 203, 207, 39, 105, 134, 176, 12, 10, 185, 181, 131, 109, 81, 251, 117]"
-    },
-    {
       "name": "placeholderPubkey",
       "type": "pubkey",
       "value": "1nc1nerator11111111111111111111111111111111"
     },
     {
-      "name": "sysvarInstructionsPubkey",
+      "name": "programId",
       "type": "pubkey",
-      "value": "Sysvar1nstructions1111111111111111111111111"
+      "value": "GgD5PpVu5Gmns4ByFTudbjjxGxtEt8zLWmgsqdJCq222"
     },
     {
       "name": "userSeed",

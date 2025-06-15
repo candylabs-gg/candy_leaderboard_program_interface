@@ -78,6 +78,11 @@
           "signer": true
         },
         {
+          "name": "cosigner",
+          "signer": true,
+          "address": "GgD5PpVu5Gmns4ByFTudbjjxGxtEt8zLWmgsqdJCq222"
+        },
+        {
           "name": "user",
           "writable": true,
           "pda": {
@@ -106,10 +111,6 @@
         },
         {
           "name": "referrer"
-        },
-        {
-          "name": "instructions",
-          "address": "Sysvar1nstructions1111111111111111111111111"
         },
         {
           "name": "system_program",
@@ -146,6 +147,11 @@
           "signer": true
         },
         {
+          "name": "cosigner",
+          "signer": true,
+          "address": "GgD5PpVu5Gmns4ByFTudbjjxGxtEt8zLWmgsqdJCq222"
+        },
+        {
           "name": "user",
           "writable": true,
           "pda": {
@@ -171,10 +177,6 @@
               }
             ]
           }
-        },
-        {
-          "name": "instructions",
-          "address": "Sysvar1nstructions1111111111111111111111111"
         },
         {
           "name": "system_program",
@@ -252,26 +254,6 @@
   "errors": [
     {
       "code": 6000,
-      "name": "PriceBelowMinimumThreshold",
-      "msg": "PriceBelowMinimumThreshold"
-    },
-    {
-      "code": 6001,
-      "name": "SecpInstructionMissing",
-      "msg": "SecpInstructionMissing"
-    },
-    {
-      "code": 6002,
-      "name": "SecpInstructionInvalid",
-      "msg": "SecpInstructionInvalid"
-    },
-    {
-      "code": 6003,
-      "name": "InvalidSignedMessage",
-      "msg": "InvalidSignedMessage"
-    },
-    {
-      "code": 6004,
       "name": "InvalidReferrer",
       "msg": "InvalidReferrer"
     }
@@ -491,24 +473,14 @@
       "value": "[0]"
     },
     {
-      "name": "MESSAGE_PUBKEY",
-      "type": {
-        "array": [
-          "u8",
-          20
-        ]
-      },
-      "value": "[36, 222, 218, 73, 135, 203, 207, 39, 105, 134, 176, 12, 10, 185, 181, 131, 109, 81, 251, 117]"
-    },
-    {
       "name": "PLACEHOLDER_PUBKEY",
       "type": "pubkey",
       "value": "1nc1nerator11111111111111111111111111111111"
     },
     {
-      "name": "SYSVAR_INSTRUCTIONS_PUBKEY",
+      "name": "PROGRAM_ID",
       "type": "pubkey",
-      "value": "Sysvar1nstructions1111111111111111111111111"
+      "value": "GgD5PpVu5Gmns4ByFTudbjjxGxtEt8zLWmgsqdJCq222"
     },
     {
       "name": "USER_SEED",

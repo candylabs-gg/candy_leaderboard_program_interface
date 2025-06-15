@@ -1,13 +1,6 @@
-import type { Wallet } from "@coral-xyz/anchor";
-import type {
-  Commitment,
-  Connection,
-  PublicKey,
-  TransactionInstruction,
-} from "@solana/web3.js";
-import { AnchorProvider, Program, web3 } from "@coral-xyz/anchor";
-import { Secp256k1Program } from "@solana/web3.js";
-import { ethers } from "ethers";
+import type { Commitment, Connection, PublicKey } from "@solana/web3.js";
+import { AnchorProvider, Program, Wallet, web3 } from "@coral-xyz/anchor";
+import { Transaction } from "@solana/web3.js";
 
 import type { InstructionAccounts, InstructionArgs } from "./anchor-types";
 import type { CandyLeaderboard } from "./candy_leaderboard";
@@ -16,14 +9,13 @@ import { ProgramStatic } from "./program-static";
 
 export class CandyMarketplaceProgram {
   public program: Program<CandyLeaderboard>;
-  public payer: PublicKey;
   public utils = ProgramStatic();
-  public sysvarInstructions = this.utils.getConstantValue(
-    "sysvarInstructionsPubkey",
-  );
   public placeholderPubkey = this.utils.getConstantValue("placeholderPubkey");
+  public signer: PublicKey;
+  public connection: Connection;
   private commitment: Commitment;
   private showErrors: boolean;
+  private wallet: Wallet | AnchorProvider;
 
   constructor(
     connection: Connection,
@@ -43,9 +35,11 @@ export class CandyMarketplaceProgram {
         IDL as CandyLeaderboard,
         new AnchorProvider(connection, wallet),
       );
-    this.payer = wallet.publicKey;
+    this.wallet = wallet;
+    this.connection = connection;
     this.showErrors = optionalArgs?.showErrors ?? false;
     this.commitment = optionalArgs?.commitment ?? "confirmed";
+    this.signer = wallet.publicKey;
   }
 
   findUserAccount({ owner }: { owner: PublicKey }) {
@@ -59,102 +53,114 @@ export class CandyMarketplaceProgram {
     )[0];
   }
 
-  async initUser(
+  getDeserializedTx(serializedTx: string) {
+    return Transaction.from(Buffer.from(serializedTx, "base64"));
+  }
+
+  async sendSignedTx(deserializedTx: Transaction, label?: string) {
+    try {
+      return await this.connection.sendRawTransaction(
+        deserializedTx.serialize(),
+      );
+    } catch (error) {
+      this.handleError(label ?? "", error);
+    }
+  }
+
+  async getInitUserSerializedTx(
     args: InstructionArgs<"initUser">,
-    partialAccounts: Pick<InstructionAccounts<"initUser">, "referrer">,
-    transactionInstructions: TransactionInstruction[],
+    partialAccounts: Pick<
+      InstructionAccounts<"initUser">,
+      "payer" | "referrer"
+    >,
   ) {
     const user = this.findUserAccount({
-      owner: this.payer,
+      owner: partialAccounts.payer,
     });
     const accounts: InstructionAccounts<"initUser"> = {
       ...partialAccounts,
-      payer: this.payer,
-      instructions: this.sysvarInstructions,
+      cosigner: this.program.programId,
+      payer: partialAccounts.payer,
       user,
     };
     try {
-      await this.program.methods
-        .initUser(args)
-        .accounts(accounts)
-        .preInstructions(transactionInstructions)
-        .rpc({ commitment: this.commitment });
+      if (this.wallet instanceof AnchorProvider && this.wallet.wallet.payer) {
+        const transaction = await this.program.methods
+          .initUser(args)
+          .accounts(accounts)
+          .transaction();
+        transaction.feePayer = partialAccounts.payer;
+        transaction.recentBlockhash = await this.connection
+          .getLatestBlockhash()
+          .then((res) => res.blockhash);
+        transaction.partialSign(this.wallet.wallet.payer);
+        return transaction
+          .serialize({
+            verifySignatures: false,
+            requireAllSignatures: false,
+          })
+          .toString("base64");
+      } else throw new Error("Wallet must be an instance of AnchorProvider");
     } catch (error) {
-      return this.handleError("initUser", error);
+      this.handleError("initUser", error);
     }
   }
 
-  async updateUser(
+  async getUpdateUserSerializedTx(
     args: InstructionArgs<"updateUser">,
-    transactionInstructions: TransactionInstruction[],
+    partialAccounts: Pick<InstructionAccounts<"updateUser">, "payer">,
   ) {
     const user = this.findUserAccount({
-      owner: this.payer,
+      owner: partialAccounts.payer,
     });
     const accounts: InstructionAccounts<"updateUser"> = {
-      payer: this.payer,
-      instructions: this.sysvarInstructions,
+      payer: partialAccounts.payer,
+      cosigner: this.program.programId,
       user,
     };
     try {
-      await this.program.methods
-        .updateUser(args)
-        .accounts(accounts)
-        .preInstructions(transactionInstructions)
-        .rpc({ commitment: this.commitment });
+      if (this.wallet instanceof AnchorProvider && this.wallet.wallet.payer) {
+        const transaction = await this.program.methods
+          .updateUser(args)
+          .accounts(accounts)
+          .transaction();
+        transaction.feePayer = partialAccounts.payer;
+        transaction.recentBlockhash = await this.connection
+          .getLatestBlockhash()
+          .then((res) => res.blockhash);
+        transaction.partialSign(this.wallet.wallet.payer);
+        return transaction
+          .serialize({
+            verifySignatures: false,
+            requireAllSignatures: false,
+          })
+          .toString("base64");
+      } else throw new Error("Wallet must be an instance of AnchorProvider");
     } catch (error) {
-      return this.handleError("updateUser", error);
+      this.handleError("updateUser", error);
     }
   }
 
-  async deleteUser() {
+  async deleteUser(
+    partialAccounts: Pick<InstructionAccounts<"deleteUser">, "payer">,
+  ) {
     const user = this.findUserAccount({
-      owner: this.payer,
+      owner: partialAccounts.payer,
     });
     const accounts: InstructionAccounts<"deleteUser"> = {
-      payer: this.payer,
+      payer: partialAccounts.payer,
       user,
     };
     try {
-      await this.program.methods
-        .deleteUser()
-        .accounts(accounts)
-        .rpc({ commitment: this.commitment });
+      if (this.wallet instanceof Wallet) {
+        await this.program.methods
+          .deleteUser()
+          .accounts(accounts)
+          .rpc({ commitment: this.commitment });
+      } else throw new Error("Wallet must be an instance of Wallet");
     } catch (error) {
       return this.handleError("deleteUser", error);
     }
-  }
-
-  getSignature(message: string, wallet?: ethers.Wallet) {
-    const ethWallet =
-      wallet ?? new ethers.Wallet(process.env.PRIVATE_KEY ?? "");
-    const messageHash = ethers.keccak256(ethers.toUtf8Bytes(message));
-    return ethWallet.signingKey.sign(messageHash);
-  }
-
-  getSecp256k1Instruction(
-    message: string,
-    signature: ethers.Signature,
-    address?: string,
-  ) {
-    const ethAddress = address ?? new ethers.Wallet(process.env.PRIVATE_KEY ?? "").address
-
-    const messageBytes = Buffer.from(message);
-
-    const rBuf = Buffer.from(signature.r.slice(2), "hex");
-    const sBuf = Buffer.from(signature.s.slice(2), "hex");
-    const recoveryId = signature.v >= 27 ? signature.v - 27 : signature.v;
-
-    if (rBuf.length !== 32 || sBuf.length !== 32) {
-      throw new Error("Signature r or s is not 32 bytes");
-    }
-
-    return Secp256k1Program.createInstructionWithEthAddress({
-      ethAddress: ethAddress.slice(2),
-      message: messageBytes,
-      signature: Buffer.concat([rBuf, sBuf]), // 64 bytes
-      recoveryId,
-    });
   }
 
   private handleError(instructionName: string, error: unknown) {
