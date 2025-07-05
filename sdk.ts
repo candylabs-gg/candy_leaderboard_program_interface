@@ -43,7 +43,7 @@ const ACHIEVEMENT_SET: Mnemonic[] = [
   "wallet_waitlist",
 ];
 const ACHIEVEMENTS_ONCHAIN_ARRAY_LENGTH = 2;
-const TRANSACTION_INSTRUCTION_COUNT = 0;
+const TRANSACTION_INSTRUCTION_COUNT = 1;
 const TRANSACTION_INSTRUCTION_INDEX = 0;
 
 export class CandyLeaderboardSDK {
@@ -115,7 +115,7 @@ export class CandyLeaderboardSDK {
         );
       }
 
-      if (encoded[u128Index])
+      if (encoded[u128Index] !== undefined)
         encoded[u128Index] = encoded[u128Index] | (1n << BigInt(bitIndex));
       else throw new Error("Unexpected error while encoding achievements!");
     }
@@ -229,13 +229,27 @@ export class CandyLeaderboardSDK {
     }
   }
 
-  async getInitUserSerializedTx(
-    args: InstructionArgs<"initUser">,
+  serializeTx(transaction: Transaction) {
+    return transaction
+      .serialize({
+        verifySignatures: false,
+        requireAllSignatures: false,
+      })
+      .toString("base64");
+  }
+
+  async getInitUserTx({
+    args,
+    partialAccounts,
+    signAndSerialize = false,
+  }: {
+    args: InstructionArgs<"initUser">;
     partialAccounts: Pick<
       InstructionAccounts<"initUser">,
       "payer" | "referrer"
-    >,
-  ) {
+    >;
+    signAndSerialize?: boolean;
+  }) {
     const user = this.findUserAccount({
       owner: partialAccounts.payer,
     });
@@ -247,32 +261,38 @@ export class CandyLeaderboardSDK {
       systemProgram: SYSTEM_PROGRAM_ID,
     };
     try {
-      if (this.wallet instanceof AnchorProvider && this.wallet.wallet.payer) {
-        const transaction = await this.program.methods
-          .initUser(args)
-          .accounts(accounts)
-          .transaction();
-        transaction.feePayer = partialAccounts.payer;
-        transaction.recentBlockhash = await this.connection
-          .getLatestBlockhash()
-          .then((res) => res.blockhash);
-        transaction.partialSign(this.wallet.wallet.payer);
-        return transaction
-          .serialize({
-            verifySignatures: false,
-            requireAllSignatures: false,
-          })
-          .toString("base64");
-      } else throw new Error("Wallet must be an instance of AnchorProvider");
+      const deserializedTransaction = await this.program.methods
+        .initUser(args)
+        .accounts(accounts)
+        .transaction();
+      deserializedTransaction.feePayer = partialAccounts.payer;
+      deserializedTransaction.recentBlockhash = await this.connection
+        .getLatestBlockhash()
+        .then((res) => res.blockhash);
+      if (
+        this.wallet instanceof AnchorProvider &&
+        this.wallet.wallet.payer &&
+        signAndSerialize
+      ) {
+        deserializedTransaction.partialSign(this.wallet.wallet.payer);
+        return this.serializeTx(deserializedTransaction);
+      } else if (!(this.wallet instanceof AnchorProvider) && signAndSerialize)
+        throw new Error("Wallet must be an instance of AnchorProvider");
+      else return deserializedTransaction;
     } catch (error) {
       this.handleError("initUser", error);
     }
   }
 
-  async getUpdateUserSerializedTx(
-    args: InstructionArgs<"updateUser">,
-    partialAccounts: Pick<InstructionAccounts<"updateUser">, "payer">,
-  ) {
+  async getUpdateTx({
+    args,
+    partialAccounts,
+    signAndSerialize = false,
+  }: {
+    args: InstructionArgs<"updateUser">;
+    partialAccounts: Pick<InstructionAccounts<"updateUser">, "payer">;
+    signAndSerialize?: boolean;
+  }) {
     const user = this.findUserAccount({
       owner: partialAccounts.payer,
     });
@@ -283,23 +303,24 @@ export class CandyLeaderboardSDK {
       systemProgram: SYSTEM_PROGRAM_ID,
     };
     try {
-      if (this.wallet instanceof AnchorProvider && this.wallet.wallet.payer) {
-        const transaction = await this.program.methods
-          .updateUser(args)
-          .accounts(accounts)
-          .transaction();
-        transaction.feePayer = partialAccounts.payer;
-        transaction.recentBlockhash = await this.connection
-          .getLatestBlockhash()
-          .then((res) => res.blockhash);
-        transaction.partialSign(this.wallet.wallet.payer);
-        return transaction
-          .serialize({
-            verifySignatures: false,
-            requireAllSignatures: false,
-          })
-          .toString("base64");
-      } else throw new Error("Wallet must be an instance of AnchorProvider");
+      const deserializedTransaction = await this.program.methods
+        .updateUser(args)
+        .accounts(accounts)
+        .transaction();
+      deserializedTransaction.feePayer = partialAccounts.payer;
+      deserializedTransaction.recentBlockhash = await this.connection
+        .getLatestBlockhash()
+        .then((res) => res.blockhash);
+      if (
+        this.wallet instanceof AnchorProvider &&
+        this.wallet.wallet.payer &&
+        signAndSerialize
+      ) {
+        deserializedTransaction.partialSign(this.wallet.wallet.payer);
+        return this.serializeTx(deserializedTransaction);
+      } else if (!(this.wallet instanceof AnchorProvider) && signAndSerialize)
+        throw new Error("Wallet must be an instance of AnchorProvider");
+      else return deserializedTransaction;
     } catch (error) {
       this.handleError("updateUser", error);
     }
