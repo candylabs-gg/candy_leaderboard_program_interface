@@ -7,7 +7,7 @@ import type { CandyLeaderboard } from "./candy_leaderboard";
 import IDL from "./candy_leaderboard.json";
 import { ProgramStatic } from "./util";
 
-export class CandyMarketplaceSDK {
+export class CandyLeaderboardSDK {
   public program: Program<CandyLeaderboard>;
   public utils = ProgramStatic();
   public placeholderPubkey = this.utils.getConstantValue("placeholderPubkey");
