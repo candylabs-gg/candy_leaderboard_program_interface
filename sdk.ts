@@ -172,7 +172,7 @@ export class CandyLeaderboardSDK {
       !achievements.every((a, i) => a.eq(encoded[i] || new BN(0)))
     ) {
       throw new Error(
-        "Mismatch between onchain and expected encoded achievements!",
+        `Mismatch between onchain and expected encoded achievements! Expected: ${(encoded[0]?.toString(10), encoded[1]?.toString(10))}, Received: ${(achievements[0]?.toString(10), achievements[1]?.toString(10))}`,
       );
     }
   }
