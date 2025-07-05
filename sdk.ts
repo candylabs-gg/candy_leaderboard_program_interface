@@ -54,7 +54,6 @@ export class CandyLeaderboardSDK {
   public connection: Connection;
   private commitment: Commitment;
   private showErrors: boolean;
-  private wallet: Wallet | AnchorProvider;
 
   constructor(
     connection: Connection,
@@ -74,7 +73,6 @@ export class CandyLeaderboardSDK {
         IDL as CandyLeaderboard,
         new AnchorProvider(connection, wallet),
       );
-    this.wallet = wallet;
     this.connection = connection;
     this.showErrors = optionalArgs?.showErrors ?? false;
     this.commitment = optionalArgs?.commitment ?? "confirmed";
