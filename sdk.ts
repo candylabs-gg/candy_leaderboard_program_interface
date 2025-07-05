@@ -1,4 +1,11 @@
-import { AnchorProvider, BN, Program, Wallet, web3 } from "@coral-xyz/anchor";
+import {
+  AnchorProvider,
+  BN,
+  BorshInstructionCoder,
+  Program,
+  Wallet,
+  web3,
+} from "@coral-xyz/anchor";
 import {
   Commitment,
   Connection,
@@ -36,6 +43,8 @@ const ACHIEVEMENT_SET: Mnemonic[] = [
   "wallet_waitlist",
 ];
 const ACHIEVEMENTS_ONCHAIN_ARRAY_LENGTH = 2;
+const TRANSACTION_INSTRUCTION_COUNT = 0;
+const TRANSACTION_INSTRUCTION_INDEX = 0;
 
 export class CandyLeaderboardSDK {
   public program: Program<CandyLeaderboard>;
@@ -114,8 +123,100 @@ export class CandyLeaderboardSDK {
 
     return encodedBNs;
   }
+
+  private deserializeAndValidateInitUpdateTx(
+    serializedTx: string,
+    expectedIxName: "initUser" | "updateUser",
+  ) {
+    const transaction = this.getDeserializedTx(serializedTx);
+    if (!transaction) throw new Error("Nothing to deserialize!");
+    if (transaction.instructions.length !== TRANSACTION_INSTRUCTION_COUNT) {
+      throw new Error("Unexpected instructions length");
+    }
+
+    const instruction = transaction.instructions[TRANSACTION_INSTRUCTION_INDEX];
+    if (!instruction) throw new Error(`Missing ${expectedIxName} instruction!`);
+    if (
+      instruction.programId.toBase58() !== this.program.programId.toBase58()
+    ) {
+      throw new Error("Unexpected program address");
+    }
+
+    const coder = new BorshInstructionCoder(this.program.idl);
+    const decoded = coder.decode(instruction.data) as {
+      name: "initUser" | "updateUser";
+      data: { instructionArgs: InstructionArgs<"initUser" | "updateUser"> };
+    } | null;
+
+    if (!decoded || decoded.name !== expectedIxName) {
+      throw new Error("Unexpected or missing instruction data!");
+    }
+
+    return { transaction, instruction, decoded };
+  }
+
   getDeserializedTx(serializedTx: string) {
     return Transaction.from(Buffer.from(serializedTx, "base64"));
+  }
+
+  private validateInitUpdateInstructionArgs(
+    decodedArgs: InstructionArgs<"initUser" | "updateUser">,
+    userData: { xp: number; aura: number; achievements: Mnemonic[] },
+  ) {
+    const { achievements, aura, xp } = decodedArgs;
+    if (Number(aura) > userData.aura || Number(xp) > userData.xp) {
+      throw new Error("Unexpected xp/aura values!");
+    }
+
+    const encoded = this.getEncodedAchievements(userData.achievements);
+    if (
+      achievements.length !== encoded.length ||
+      !achievements.every((a, i) => a.eq(encoded[i] || new BN(0)))
+    ) {
+      throw new Error(
+        "Mismatch between onchain and expected encoded achievements!",
+      );
+    }
+  }
+
+  validateAndDeserializeInitUpdateTransaction({
+    serializedTransaction,
+    walletAddress,
+    userData,
+    ixName,
+  }: {
+    serializedTransaction: string;
+    walletAddress: string;
+    userData: { xp: number; aura: number; achievements: Mnemonic[] };
+    ixName: "initUser" | "updateUser";
+  }) {
+    const { transaction, instruction, decoded } =
+      this.deserializeAndValidateInitUpdateTx(serializedTransaction, ixName);
+    const ixDef = this.program.idl.instructions.find((i) => i.name === ixName);
+    const instructionAccounts: Partial<
+      InstructionAccounts<"initUser" | "updateUser">
+    > = {};
+    try {
+      ixDef?.accounts.forEach((acc, i) => {
+        if (!instruction.keys[i])
+          throw new Error("Unexpected out of bounds instruction key");
+        const pubkey = instruction.keys[i].pubkey;
+        instructionAccounts[acc.name] = pubkey;
+      });
+    } catch {
+      throw new Error("Missing account keys!");
+    }
+    if (Object.keys(instructionAccounts).length !== instruction.keys.length)
+      throw new Error("Account length mismatch!");
+    if (instructionAccounts.payer?.toBase58() !== walletAddress)
+      throw new Error("Wallet address mismatch!");
+    if (transaction.feePayer?.toBase58() !== walletAddress)
+      throw new Error("Fee payer mismatch!");
+    this.validateInitUpdateInstructionArgs(
+      decoded.data.instructionArgs,
+      userData,
+    );
+    return transaction;
   }
 
   async sendSignedTx(deserializedTx: Transaction, label?: string) {
