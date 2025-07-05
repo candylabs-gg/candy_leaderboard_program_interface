@@ -156,7 +156,9 @@ export type ReplaceUndefinedWithNull<T> = {
 export type InstructionAccounts<T extends InstructionName> =
   ReplaceUndefinedWithNull<ExtractAccounts<T>>;
 
-export type InstructionArgs<T extends keyof StaticProgramMethods> = Parameters<
+export type Instruction = keyof StaticProgramMethods;
+
+export type InstructionArgs<T extends Instruction> = Parameters<
   StaticProgramMethods[T]
 >[0];
 
