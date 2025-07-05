@@ -1,4 +1,4 @@
-import { AnchorProvider, Program, Wallet, web3 } from "@coral-xyz/anchor";
+import { AnchorProvider, BN, Program, Wallet, web3 } from "@coral-xyz/anchor";
 import {
   Commitment,
   Connection,
@@ -9,9 +9,33 @@ import {
 import type { InstructionAccounts, InstructionArgs } from "./anchor-types";
 import type { CandyLeaderboard } from "./candy_leaderboard";
 import IDL from "./candy_leaderboard.json";
+import { Mnemonic } from "./types";
 import { ProgramStatic } from "./util";
 
 const SYSTEM_PROGRAM_ID = new PublicKey("11111111111111111111111111111111");
+const ACHIEVEMENT_SET: Mnemonic[] = [
+  "before_ftx",
+  "bridged_degod",
+  "burn_nft",
+  "deploy_pump",
+  "follow_canydlabs_x",
+  "fumbled_bag",
+  "hold_nft_0",
+  "hold_nft_5",
+  "hold_nft_10",
+  "hold_nft_25",
+  "hold_nft_50",
+  "i_minted",
+  "joined_telegram",
+  "jupiter_swap",
+  "own_sns_domain",
+  "pengu_airdrop",
+  "retardio_casino",
+  "share_achievement",
+  "wallet_backpack",
+  "wallet_waitlist",
+];
+const ACHIEVEMENTS_ONCHAIN_ARRAY_LENGTH = 2;
 
 export class CandyLeaderboardSDK {
   public program: Program<CandyLeaderboard>;
@@ -59,6 +83,37 @@ export class CandyLeaderboardSDK {
     )[0];
   }
 
+  getEncodedAchievements(dbAchievements: Mnemonic[]) {
+    // Initialize fixed length array filled with 0n
+    const encoded: bigint[] = new Array(ACHIEVEMENTS_ONCHAIN_ARRAY_LENGTH).fill(
+      0n,
+    );
+
+    for (const achievement of dbAchievements) {
+      const index = ACHIEVEMENT_SET.indexOf(achievement);
+      if (index === -1) {
+        throw new Error(`Unknown achievement mnemonic: ${achievement}`);
+      }
+
+      const u128Index = Math.floor(index / 128);
+      const bitIndex = index % 128;
+
+      if (u128Index >= ACHIEVEMENTS_ONCHAIN_ARRAY_LENGTH) {
+        // If your dbAchievements somehow includes achievements beyond 256 bits,
+        // handle this case explicitly or throw an error
+        throw new Error(
+          `Achievement index out of fixed length bounds: ${achievement}`,
+        );
+      }
+
+      if (encoded[u128Index])
+        encoded[u128Index] = encoded[u128Index] | (1n << BigInt(bitIndex));
+      else throw new Error("Unexpected error while encoding achievements!");
+    }
+    const encodedBNs = encoded.map((val) => new BN(val.toString()));
+
+    return encodedBNs;
+  }
   getDeserializedTx(serializedTx: string) {
     return Transaction.from(Buffer.from(serializedTx, "base64"));
   }
