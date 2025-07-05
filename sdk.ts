@@ -238,17 +238,15 @@ export class CandyLeaderboardSDK {
       .toString("base64");
   }
 
-  async getInitUserTx({
+  async getInitUserDeserializedTx({
     args,
     partialAccounts,
-    signAndSerialize = false,
   }: {
     args: InstructionArgs<"initUser">;
     partialAccounts: Pick<
       InstructionAccounts<"initUser">,
       "payer" | "referrer"
     >;
-    signAndSerialize?: boolean;
   }) {
     const user = this.findUserAccount({
       owner: partialAccounts.payer,
@@ -269,29 +267,18 @@ export class CandyLeaderboardSDK {
       deserializedTransaction.recentBlockhash = await this.connection
         .getLatestBlockhash()
         .then((res) => res.blockhash);
-      if (
-        this.wallet instanceof AnchorProvider &&
-        this.wallet.wallet.payer &&
-        signAndSerialize
-      ) {
-        deserializedTransaction.partialSign(this.wallet.wallet.payer);
-        return this.serializeTx(deserializedTransaction);
-      } else if (!(this.wallet instanceof AnchorProvider) && signAndSerialize)
-        throw new Error("Wallet must be an instance of AnchorProvider");
-      else return deserializedTransaction;
+      return deserializedTransaction;
     } catch (error) {
       this.handleError("initUser", error);
     }
   }
 
-  async getUpdateTx({
+  async getUpdateUserDeserializedTx({
     args,
     partialAccounts,
-    signAndSerialize = false,
   }: {
     args: InstructionArgs<"updateUser">;
     partialAccounts: Pick<InstructionAccounts<"updateUser">, "payer">;
-    signAndSerialize?: boolean;
   }) {
     const user = this.findUserAccount({
       owner: partialAccounts.payer,
@@ -311,16 +298,7 @@ export class CandyLeaderboardSDK {
       deserializedTransaction.recentBlockhash = await this.connection
         .getLatestBlockhash()
         .then((res) => res.blockhash);
-      if (
-        this.wallet instanceof AnchorProvider &&
-        this.wallet.wallet.payer &&
-        signAndSerialize
-      ) {
-        deserializedTransaction.partialSign(this.wallet.wallet.payer);
-        return this.serializeTx(deserializedTransaction);
-      } else if (!(this.wallet instanceof AnchorProvider) && signAndSerialize)
-        throw new Error("Wallet must be an instance of AnchorProvider");
-      else return deserializedTransaction;
+      return deserializedTransaction;
     } catch (error) {
       this.handleError("updateUser", error);
     }
