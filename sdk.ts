@@ -5,9 +5,9 @@ import { Transaction } from "@solana/web3.js";
 import type { InstructionAccounts, InstructionArgs } from "./anchor-types";
 import type { CandyLeaderboard } from "./candy_leaderboard";
 import IDL from "./candy_leaderboard.json";
-import { ProgramStatic } from "./program-static";
+import { ProgramStatic } from "./util";
 
-export class CandyMarketplaceProgram {
+export class CandyMarketplaceSDK {
   public program: Program<CandyLeaderboard>;
   public utils = ProgramStatic();
   public placeholderPubkey = this.utils.getConstantValue("placeholderPubkey");
