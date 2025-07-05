@@ -33,34 +33,10 @@ export type CandyLeaderboard = {
         },
         {
           "name": "user",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  117,
-                  115,
-                  101,
-                  114
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "payer"
-              },
-              {
-                "kind": "const",
-                "value": [
-                  0
-                ]
-              }
-            ]
-          }
+          "writable": true
         },
         {
-          "name": "systemProgram",
-          "address": "11111111111111111111111111111111"
+          "name": "systemProgram"
         }
       ],
       "args": []
@@ -85,42 +61,17 @@ export type CandyLeaderboard = {
         },
         {
           "name": "cosigner",
-          "signer": true,
-          "address": "GgD5PpVu5Gmns4ByFTudbjjxGxtEt8zLWmgsqdJCq222"
+          "signer": true
         },
         {
           "name": "user",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  117,
-                  115,
-                  101,
-                  114
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "payer"
-              },
-              {
-                "kind": "const",
-                "value": [
-                  0
-                ]
-              }
-            ]
-          }
+          "writable": true
         },
         {
           "name": "referrer"
         },
         {
-          "name": "systemProgram",
-          "address": "11111111111111111111111111111111"
+          "name": "systemProgram"
         }
       ],
       "args": [
@@ -154,39 +105,14 @@ export type CandyLeaderboard = {
         },
         {
           "name": "cosigner",
-          "signer": true,
-          "address": "GgD5PpVu5Gmns4ByFTudbjjxGxtEt8zLWmgsqdJCq222"
+          "signer": true
         },
         {
           "name": "user",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  117,
-                  115,
-                  101,
-                  114
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "payer"
-              },
-              {
-                "kind": "const",
-                "value": [
-                  0
-                ]
-              }
-            ]
-          }
+          "writable": true
         },
         {
-          "name": "systemProgram",
-          "address": "11111111111111111111111111111111"
+          "name": "systemProgram"
         }
       ],
       "args": [

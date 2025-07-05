@@ -1,11 +1,17 @@
-import type { Commitment, Connection, PublicKey } from "@solana/web3.js";
 import { AnchorProvider, Program, Wallet, web3 } from "@coral-xyz/anchor";
-import { Transaction } from "@solana/web3.js";
+import {
+  Commitment,
+  Connection,
+  PublicKey,
+  Transaction,
+} from "@solana/web3.js";
 
 import type { InstructionAccounts, InstructionArgs } from "./anchor-types";
 import type { CandyLeaderboard } from "./candy_leaderboard";
 import IDL from "./candy_leaderboard.json";
 import { ProgramStatic } from "./util";
+
+const SYSTEM_PROGRAM_ID = new PublicKey("11111111111111111111111111111111");
 
 export class CandyLeaderboardSDK {
   public program: Program<CandyLeaderboard>;
@@ -82,6 +88,7 @@ export class CandyLeaderboardSDK {
       cosigner: this.program.programId,
       payer: partialAccounts.payer,
       user,
+      systemProgram: SYSTEM_PROGRAM_ID,
     };
     try {
       if (this.wallet instanceof AnchorProvider && this.wallet.wallet.payer) {
@@ -117,6 +124,7 @@ export class CandyLeaderboardSDK {
       payer: partialAccounts.payer,
       cosigner: this.program.programId,
       user,
+      systemProgram: SYSTEM_PROGRAM_ID,
     };
     try {
       if (this.wallet instanceof AnchorProvider && this.wallet.wallet.payer) {
@@ -150,6 +158,7 @@ export class CandyLeaderboardSDK {
     const accounts: InstructionAccounts<"deleteUser"> = {
       payer: partialAccounts.payer,
       user,
+      systemProgram: SYSTEM_PROGRAM_ID,
     };
     try {
       if (this.wallet instanceof Wallet) {

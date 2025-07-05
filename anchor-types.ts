@@ -144,10 +144,8 @@ type ExtractOptionalSigners<Name extends InstructionName> = {
 type ExtractSignerKeypairs<T extends InstructionName> =
   ExtractRequiredSigners<T> & ExtractOptionalSigners<T>;
 
-export type SignerAccounts<T extends InstructionName> = Omit<
-  ExtractSignerKeypairs<T>,
-  "systemProgram" | "tokenProgram"
->;
+export type SignerAccounts<T extends InstructionName> =
+  ExtractSignerKeypairs<T>;
 
 export type ReplaceUndefinedWithNull<T> = {
   [K in keyof T]-?: undefined extends T[K]
@@ -156,9 +154,7 @@ export type ReplaceUndefinedWithNull<T> = {
 };
 
 export type InstructionAccounts<T extends InstructionName> =
-  ReplaceUndefinedWithNull<
-    Omit<ExtractAccounts<T>, "systemProgram" | "tokenProgram">
-  >;
+  ReplaceUndefinedWithNull<ExtractAccounts<T>>;
 
 export type InstructionArgs<T extends keyof StaticProgramMethods> = Parameters<
   StaticProgramMethods[T]
