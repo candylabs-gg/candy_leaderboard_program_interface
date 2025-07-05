@@ -338,12 +338,10 @@ export class CandyLeaderboardSDK {
       systemProgram: SYSTEM_PROGRAM_ID,
     };
     try {
-      if (this.wallet instanceof Wallet) {
-        await this.program.methods
-          .deleteUser()
-          .accounts(accounts)
-          .rpc({ commitment: this.commitment });
-      } else throw new Error("Wallet must be an instance of Wallet");
+      await this.program.methods
+        .deleteUser()
+        .accounts(accounts)
+        .rpc({ commitment: this.commitment });
     } catch (error) {
       return this.handleError("deleteUser", error);
     }
